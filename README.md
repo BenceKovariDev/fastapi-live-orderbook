@@ -1,18 +1,43 @@
-# Enterprise High-Frequency Order Book Streamer (Step 6)
+# ⚡ Low-Latency Binance-Grade Matching Engine & Live Streamer
 
-An enterprise-grade, ultra-low latency order book streaming microservice featuring **Fan-Out Distribution Architecture** and **Network Heartbeat (Keep-Alive)** verification layers.
+A high-performance, real-time cryptocurrency orderbook matching engine implemented in Python using FastAPI, optimized with an in-memory data structure for atomic execution, and backed by Redis Pub/Sub for scalable, live fan-out WebSocket broadcasting.
 
-This repository marks **Step 6 of my 1000-lesson masterclass backend engineering sprint**. Instead of multiplying database connection pools, this system scales linearly by binding thousands of concurrent WebSockets to a single centralized Redis Pub/Sub stream core. Built inside a localized mobile Linux ecosystem (UserLAnd) running Python 3.14 and Redis 8.0.
+## 🚀 Key Features
 
-## 🚀 Advanced Architectural Upgrades
+*   **In-Memory Matching Engine:** Performs real-time order matching (Bids/Asks) with atomic trade execution and price-time priority optimization.
+*   **Redis Pub/Sub Layer:** Decouples the core execution engine from the communication layer, allowing ultra-low latency event streaming.
+*   **Async Fan-Out Connection Manager:** Efficiently broadcasts live orderbook updates to thousands of concurrent WebSocket clients simultaneously.
+*   **Asynchronous Architecture:** Built from the ground up using `asyncio` and `FastAPI` to guarantee high throughput under heavy traffic.
+*   **Terminal UI:** Includes a built-in real-time frontend to monitor market depth and manually execute limit orders.
 
-- **Fan-Out Clustering (Resource Protection)**: Implements a centralized connection manager. Only **one** global asynchronous worker subscribes to the Redis instance, multiplexing and distributing incoming frames natively via memory buffers to all connected clients.
-- **Bi-Directional Network Heartbeats**: Integrates an asynchronous ping/pong routine to detect stale sockets, prevent memory leaks, and forcefully release dead communication pipes.
-- **Graceful Fault Tolerance**: Client-side layers utilize automated state-checking hooks to execute programmatic reconnections during transit failures without disrupting overall system availability.
+## 🏗️ Architecture Overview
+
+[ Limit Order Post ] ──> [ FastAPI Endpoint ]
+│
+▼
+[ In-Memory Matching Engine ]
+│
+(Atomic Match)
+│
+▼
+[ Redis Pub/Sub Channel ]
+│
+(Fan-Out Broadcast)
+│
+▼
+[ Async Connection Manager ] ──> [ WebSockets (Live UI) ]
 
 ## 🛠️ Tech Stack
 
-- **Framework**: FastAPI (Asynchronous Python 3.14)
-- **Message Broker**: Redis 8.0 (In-Memory Pub/Sub Engine)
-- **Protocol**: WebSockets with native Keep-Alive framing
-- **Architecture**: Event-Driven Design (EDD / Fan-Out pattern)
+*   **Backend Framework:** FastAPI (Python 3.14+)
+*   **Asynchronous Runtime:** Asyncio / Uvicorn
+*   **Message Broker & State Invalidation:** Redis (aioredis)
+*   **Data Validation:** Pydantic v2
+*   **Frontend:** Real-time Async WebSocket Terminal
+
+## ⚡ Quick Start
+
+### Prerequisites
+Make sure you have a Redis server running in your environment:
+```bash
+redis-server --daemonize yes --ignore-warnings ARM64-COW-BUG
